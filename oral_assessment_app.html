@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OralIQ — AI Oral Assessment Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0f1e3c;
+    --navy-mid: #1a3260;
+    --accent: #e8531a;
+    --accent-light: #ff6b35;
+    --gold: #f5a623;
+    --cream: #faf8f4;
+    --cream-dark: #f0ece3;
+    --text: #1a1a2e;
+    --text-mid: #4a4a6a;
+    --text-light: #8a8aaa;
+    --success: #1d9e75;
+    --border: rgba(15,30,60,0.12);
+    --card-bg: #ffffff;
+    --radius: 12px;
+    --radius-lg: 20px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--navy);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 2px solid var(--accent);
+  }
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--accent); }
+  .header-nav { display: flex; gap: 8px; }
+  .nav-btn {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.75);
+    padding: 7px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  .nav-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* ── API Key Banner ── */
+  .api-banner {
+    background: #fff3cd;
+    border-bottom: 1px solid #ffc107;
+    padding: 10px 2rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: #664d03;
+  }
+  .api-banner input {
+    flex: 1;
+    max-width: 340px;
+    padding: 6px 12px;
+    border: 1px solid #ffc107;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    background: #fff;
+  }
+  .api-banner button {
+    padding: 6px 14px;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .api-key-saved { color: var(--success); font-weight: 600; }
+
+  /* ── Views ── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ── Page Shell ── */
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem;
+  }
+  .page-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 30px;
+    color: var(--navy);
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+  }
+  .page-sub {
+    color: var(--text-mid);
+    font-size: 14px;
+    margin-bottom: 2rem;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+    margin-bottom: 1.25rem;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+
+  /* ── Form Elements ── */
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-mid);
+    margin-bottom: 5px;
+  }
+  input[type="text"], input[type="email"], input[type="number"],
+  textarea, select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    background: var(--cream);
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 1rem;
+  }
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--navy);
+    background: #fff;
+  }
+  textarea { resize: vertical; min-height: 110px; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background: var(--accent-light); transform: translateY(-1px); }
+  .btn-navy {
+    background: var(--navy);
+    color: #fff;
+  }
+  .btn-navy:hover { background: var(--navy-mid); }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-mid);
+  }
+  .btn-outline:hover { border-color: var(--navy); color: var(--navy); }
+  .btn-sm { padding: 6px 14px; font-size: 13px; }
+  .btn-danger { background: #e24b4a; color: #fff; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* ── Row / Grid ── */
+  .row { display: flex; gap: 1rem; align-items: flex-start; }
+  .row > * { flex: 1; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  /* ── Question Cards ── */
+  .question-item {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.75rem;
+    position: relative;
+  }
+  .q-num {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .q-text { font-size: 14px; color: var(--text); margin-bottom: 8px; }
+  .q-role {
+    display: inline-block;
+    font-size: 11px;
+    padding: 3px 9px;
+    background: rgba(15,30,60,0.08);
+    color: var(--navy);
+    border-radius: 20px;
+    font-weight: 500;
+  }
+  .q-actions { position: absolute; top: 12px; right: 12px; display: flex; gap: 6px; }
+
+  /* ── Student Exam ── */
+  .exam-progress {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+  .progress-dot {
+    width: 32px;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--cream-dark);
+    transition: background 0.3s;
+  }
+  .progress-dot.done { background: var(--success); }
+  .progress-dot.active { background: var(--accent); }
+
+  .exam-question-card {
+    background: var(--navy);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    color: #fff;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .exam-question-card::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 160px; height: 160px;
+    background: rgba(232,83,26,0.15);
+    border-radius: 50%;
+  }
+  .role-badge {
+    display: inline-block;
+    font-size: 11px;
+    padding: 4px 10px;
+    background: rgba(232,83,26,0.25);
+    color: #ffb89a;
+    border-radius: 20px;
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+  .exam-q-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    line-height: 1.4;
+    position: relative;
+  }
+
+  .timer-bar {
+    height: 4px;
+    background: var(--cream-dark);
+    border-radius: 2px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+  .timer-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 1s linear;
+  }
+  .timer-text {
+    text-align: right;
+    font-size: 13px;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Audio Recording ── */
+  .audio-section {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  .record-btn {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .record-btn:hover { transform: scale(1.05); }
+  .record-btn.recording { background: #e24b4a; animation: pulse 1.2s infinite; }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(226,75,74,0.4); }
+    50% { box-shadow: 0 0 0 10px rgba(226,75,74,0); }
+  }
+  .record-status { font-size: 13px; color: var(--text-mid); }
+  .record-time { font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text); }
+
+  audio { width: 100%; margin-bottom: 0.75rem; border-radius: 8px; }
+
+  /* ── Feedback / Results ── */
+  .score-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    font-size: 18px;
+    font-weight: 600;
+    background: var(--navy);
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .score-badge.high { background: var(--success); }
+  .score-badge.mid { background: var(--gold); color: #4a2e00; }
+  .score-badge.low { background: #e24b4a; }
+
+  .feedback-item {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+  .feedback-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 1rem 1.25rem;
+    background: var(--cream);
+    border-bottom: 1px solid var(--border);
+  }
+  .feedback-body { padding: 1rem 1.25rem; }
+  .feedback-section {
+    margin-bottom: 0.75rem;
+  }
+  .feedback-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-light);
+    margin-bottom: 4px;
+  }
+  .feedback-text { font-size: 14px; color: var(--text-mid); line-height: 1.6; }
+
+  .overall-score {
+    background: var(--navy);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  .overall-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 64px;
+    line-height: 1;
+    color: var(--accent-light);
+    margin-bottom: 4px;
+  }
+  .overall-label { font-size: 14px; opacity: 0.7; }
+
+  /* ── Alert / Loading ── */
+  .alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 1rem;
+  }
+  .alert-info { background: #e6f1fb; color: #0c447c; border: 1px solid #b5d4f4; }
+  .alert-success { background: #eaf3de; color: #27500a; border: 1px solid #c0dd97; }
+  .alert-error { background: #fcebeb; color: #501313; border: 1px solid #f7c1c1; }
+
+  .loading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-mid);
+    font-size: 14px;
+    padding: 1rem 0;
+  }
+  .spinner {
+    width: 20px; height: 20px;
+    border: 2px solid var(--cream-dark);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Tabs ── */
+  .tab-row {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+    gap: 0;
+  }
+  .tab {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    color: var(--text-light);
+    transition: all 0.2s;
+    background: none;
+    border-top: none; border-left: none; border-right: none;
+    font-family: 'DM Sans', sans-serif;
+    margin-bottom: -1px;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ── Divider ── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+
+  /* ── File Upload ── */
+  .file-drop {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--cream);
+    margin-bottom: 1rem;
+  }
+  .file-drop:hover { border-color: var(--accent); background: #fff; }
+  .file-drop.has-file { border-color: var(--success); background: #eaf3de; }
+  .file-drop-text { font-size: 13px; color: var(--text-mid); }
+  .file-drop-text strong { display: block; margin-bottom: 4px; color: var(--text); }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .row { flex-direction: column; }
+    .header-nav .nav-btn { padding: 7px 10px; font-size: 12px; }
+  }
+
+  /* ── Practice Mode Decoration ── */
+  .practice-banner {
+    background: linear-gradient(135deg, var(--navy) 0%, #2a4580 100%);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem 2rem;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+  }
+  .practice-banner h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+  .practice-banner p { font-size: 13px; opacity: 0.75; }
+
+  /* ── Student List ── */
+  .student-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+    background: #fff;
+    gap: 12px;
+  }
+  .student-info { flex: 1; }
+  .student-name { font-weight: 500; font-size: 14px; }
+  .student-meta { font-size: 12px; color: var(--text-light); }
+
+  /* ── Hidden ── */
+  .hidden { display: none !important; }
+  .mt1 { margin-top: 1rem; }
+  .mb0 { margin-bottom: 0; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="logo">Oral<span>IQ</span></div>
+  <nav class="header-nav">
+    <button class="nav-btn active" onclick="switchView('faculty')">Faculty</button>
+    <button class="nav-btn" onclick="switchView('student')">Student Exam</button>
+    <button class="nav-btn" onclick="switchView('practice')">Practice Mode</button>
+    <button class="nav-btn" onclick="switchView('results')">Results</button>
+  </nav>
+</header>
+
+<!-- API Key Banner -->
+<div class="api-banner" id="apiBanner">
+  <span>⚙️ Enter your Anthropic API key to enable AI features:</span>
+  <input type="text" id="apiKeyInput" placeholder="sk-ant-..." />
+  <button onclick="saveApiKey()">Save</button>
+  <span id="apiKeySaved" class="api-key-saved hidden">✓ Key saved</span>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     VIEW 1: FACULTY PORTAL
+════════════════════════════════════════════════════ -->
+<div id="view-faculty" class="view active">
+<div class="page">
+  <div class="page-title">Faculty Portal</div>
+  <div class="page-sub">Upload your assignment, set the rubric, and generate oral exam questions.</div>
+
+  <div class="tab-row">
+    <button class="tab active" onclick="facultyTab(this,'setup')">Assignment Setup</button>
+    <button class="tab" onclick="facultyTab(this,'questions')">Question Bank</button>
+    <button class="tab" onclick="facultyTab(this,'students')">Student Sessions</button>
+  </div>
+
+  <!-- Setup Tab -->
+  <div id="ftab-setup">
+    <div class="card">
+      <div class="card-title">Assignment Details</div>
+      <div class="grid-2">
+        <div>
+          <label>Course Name</label>
+          <input type="text" id="courseName" placeholder="e.g. MKTG 302 – Consumer Behavior" />
+        </div>
+        <div>
+          <label>Assignment Title</label>
+          <input type="text" id="assignTitle" placeholder="e.g. Brand Strategy Case Study" />
+        </div>
+      </div>
+      <div class="grid-2">
+        <div>
+          <label>Subject Area</label>
+          <select id="subjectArea">
+            <option value="">Select subject...</option>
+            <option>Finance</option>
+            <option>Economics</option>
+            <option>Marketing</option>
+            <option>Organizational Behavior</option>
+            <option>Strategy</option>
+            <option>Accounting</option>
+            <option>Operations Management</option>
+          </select>
+        </div>
+        <div>
+          <label>Number of Questions</label>
+          <input type="number" id="numQuestions" value="5" min="1" max="15" />
+        </div>
+      </div>
+      <div class="grid-2">
+        <div>
+          <label>Time Limit per Question (seconds, 0 = no limit)</label>
+          <input type="number" id="timeLimit" value="120" min="0" max="600" />
+        </div>
+        <div>
+          <label>Assessment Type</label>
+          <select id="assessType">
+            <option value="individual">Individual</option>
+            <option value="team">Team / Group</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Assignment Prompt</div>
+      <div class="file-drop" id="promptDrop" onclick="document.getElementById('promptFile').click()">
+        <div class="file-drop-text">
+          <strong>Upload assignment PDF or paste below</strong>
+          Click to browse or drag & drop a file
+        </div>
+        <input type="file" id="promptFile" accept=".txt,.pdf" style="display:none" onchange="handleFileUpload(this,'promptText','promptDrop')">
+      </div>
+      <textarea id="promptText" placeholder="Paste or type your full assignment prompt here..."></textarea>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Grading Rubric</div>
+      <div class="file-drop" id="rubricDrop" onclick="document.getElementById('rubricFile').click()">
+        <div class="file-drop-text">
+          <strong>Upload rubric PDF or paste below</strong>
+          Click to browse or drag & drop a file
+        </div>
+        <input type="file" id="rubricFile" accept=".txt,.pdf" style="display:none" onchange="handleFileUpload(this,'rubricText','rubricDrop')">
+      </div>
+      <textarea id="rubricText" placeholder="Paste your grading rubric here — criteria, point values, expectations..."></textarea>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Student / Team Submission (Optional)</div>
+      <div class="file-drop" id="submissionDrop" onclick="document.getElementById('submissionFile').click()">
+        <div class="file-drop-text">
+          <strong>Upload student submission</strong>
+          Upload the written work to generate submission-specific questions
+        </div>
+        <input type="file" id="submissionFile" accept=".txt,.pdf" style="display:none" onchange="handleFileUpload(this,'submissionText','submissionDrop')">
+      </div>
+      <textarea id="submissionText" placeholder="Or paste the student's written submission here..."></textarea>
+    </div>
+
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="generateQuestions(false)">
+        ✦ Generate Exam Questions
+      </button>
+      <button class="btn btn-outline" onclick="generateQuestions(true)">
+        ◎ Generate Practice Questions
+      </button>
+    </div>
+
+    <div id="genLoading" class="loading hidden">
+      <div class="spinner"></div>
+      <span>Generating questions aligned with your rubric...</span>
+    </div>
+    <div id="genError" class="alert alert-error hidden"></div>
+  </div>
+
+  <!-- Questions Tab -->
+  <div id="ftab-questions" class="hidden">
+    <div id="questionBank">
+      <div class="alert alert-info">No questions generated yet. Go to Assignment Setup and click Generate Exam Questions.</div>
+    </div>
+    <div id="qActions" class="hidden" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:1rem;">
+      <button class="btn btn-navy" onclick="saveSessionLink()">⬡ Generate Student Exam Link</button>
+      <button class="btn btn-outline" onclick="downloadQuestions()">↓ Download Questions (JSON)</button>
+    </div>
+    <div id="examLinkBox" class="hidden mt1">
+      <div class="alert alert-success" id="examLinkText"></div>
+    </div>
+  </div>
+
+  <!-- Students Tab -->
+  <div id="ftab-students" class="hidden">
+    <div id="studentSessionList">
+      <div class="alert alert-info">No student sessions recorded yet. Sessions appear here after students complete exams.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     VIEW 2: STUDENT EXAM
+════════════════════════════════════════════════════ -->
+<div id="view-student" class="view">
+<div class="page">
+  <div class="page-title">Student Exam</div>
+  <div class="page-sub">Answer each question orally or in writing. Your responses are recorded and graded by AI.</div>
+
+  <!-- Student Info Form -->
+  <div id="studentInfoSection">
+    <div class="card">
+      <div class="card-title">Identify Yourself</div>
+      <div class="grid-2">
+        <div>
+          <label>Your Full Name</label>
+          <input type="text" id="studentName" placeholder="e.g. Maria Santos" />
+        </div>
+        <div>
+          <label>Student Email</label>
+          <input type="email" id="studentEmail" placeholder="e.g. msantos@university.edu" />
+        </div>
+      </div>
+      <div id="teamSection" class="hidden">
+        <label>Team Members (one per line)</label>
+        <textarea id="teamMembers" placeholder="Jane Doe&#10;John Smith&#10;Alice Lee" style="min-height:80px;"></textarea>
+      </div>
+      <div id="noQuestionsAlert" class="alert alert-error hidden">
+        No exam questions found. Ask your professor to generate questions first.
+      </div>
+      <button class="btn btn-primary" onclick="startExam()">Begin Exam →</button>
+    </div>
+  </div>
+
+  <!-- Exam Session -->
+  <div id="examSection" class="hidden">
+    <div class="exam-progress" id="examProgress"></div>
+
+    <div class="exam-question-card" id="examQuestionCard">
+      <div class="role-badge" id="examRole">Examiner</div>
+      <div class="exam-q-text" id="examQText">Loading question...</div>
+    </div>
+
+    <div class="timer-text hidden" id="timerText">Time remaining: <strong id="timerVal">—</strong></div>
+    <div class="timer-bar hidden" id="timerBar">
+      <div class="timer-fill" id="timerFill" style="width:100%"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Your Response</div>
+
+      <!-- Audio Recording -->
+      <div class="audio-section">
+        <button class="record-btn" id="recordBtn" onclick="toggleRecording()" title="Click to record">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+            <rect x="9" y="2" width="6" height="12" rx="3"/>
+            <path d="M5 11a7 7 0 0 0 14 0" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <line x1="12" y1="18" x2="12" y2="22" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <line x1="8" y1="22" x2="16" y2="22" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <div>
+          <div class="record-time" id="recordTime">0:00</div>
+          <div class="record-status" id="recordStatus">Click mic to record your answer</div>
+        </div>
+        <div style="margin-left:auto;">
+          <label style="font-size:12px;margin-bottom:4px;">Upload audio/video</label>
+          <input type="file" id="audioUpload" accept="audio/*,video/*" onchange="handleAudioUpload(this)" style="font-size:12px;width:auto;margin-bottom:0;">
+        </div>
+      </div>
+      <div id="audioPlayback" class="hidden"></div>
+      <div id="transcriptSection" class="hidden">
+        <div class="alert alert-info" id="transcriptAlert">Audio recorded. Transcription requires a Whisper API integration — for this prototype, type your response below.</div>
+      </div>
+
+      <label>Written / Typed Response <span style="font-weight:400;color:var(--text-light)">(required — type what you said or your answer)</span></label>
+      <textarea id="studentAnswer" placeholder="Type your answer here..." style="min-height:130px;"></textarea>
+
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="submitAnswer()">Submit Answer →</button>
+        <span style="font-size:13px;color:var(--text-light);" id="qCounter"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grading Screen -->
+  <div id="gradingSection" class="hidden">
+    <div class="loading">
+      <div class="spinner"></div>
+      <span>AI is reviewing your responses and generating detailed feedback...</span>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     VIEW 3: PRACTICE MODE
+════════════════════════════════════════════════════ -->
+<div id="view-practice" class="view">
+<div class="page">
+  <div class="page-title">Practice Mode</div>
+  <div class="page-sub">Prepare for your oral exam with AI-generated practice questions. These are not your actual exam questions.</div>
+
+  <div class="practice-banner">
+    <div>
+      <h3>Safe to Practice</h3>
+      <p>Practice questions are generated fresh each time and are different from your real exam. Use this to build confidence.</p>
+    </div>
+    <button class="btn btn-primary" onclick="generatePractice()">Generate Practice Set</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Your Assignment</div>
+    <label>Paste your assignment prompt or topic</label>
+    <textarea id="practicePrompt" placeholder="Paste your assignment description or topic here to get relevant practice questions..."></textarea>
+    <label>Subject Area</label>
+    <select id="practiceSubject">
+      <option>Marketing</option>
+      <option>Finance</option>
+      <option>Economics</option>
+      <option>Organizational Behavior</option>
+      <option>Strategy</option>
+    </select>
+    <button class="btn btn-navy" onclick="generatePractice()">✦ Get Practice Questions</button>
+  </div>
+
+  <div id="practiceLoading" class="loading hidden">
+    <div class="spinner"></div>
+    <span>Generating practice questions...</span>
+  </div>
+
+  <div id="practiceQuestions"></div>
+
+  <!-- Practice Q&A -->
+  <div id="practiceExamSection" class="hidden">
+    <div class="card">
+      <div class="card-title" style="color:var(--navy)">Practice Question <span id="practiceQNum"></span></div>
+      <div style="font-family:'DM Serif Display',serif;font-size:19px;margin-bottom:1.25rem;line-height:1.5;" id="practiceQText"></div>
+      <label>Your Answer</label>
+      <textarea id="practiceAnswer" style="min-height:120px;" placeholder="Answer as if in your real exam..."></textarea>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-primary" onclick="submitPracticeAnswer()">Get Feedback →</button>
+        <button class="btn btn-outline" onclick="skipPracticeQ()">Skip</button>
+      </div>
+    </div>
+    <div id="practiceFeedbackSection" class="hidden card">
+      <div class="card-title">AI Feedback</div>
+      <div id="practiceFeedback"></div>
+      <button class="btn btn-navy mt1" onclick="nextPracticeQ()">Next Question →</button>
+    </div>
+    <div id="practiceFeedbackLoading" class="loading hidden">
+      <div class="spinner"></div>
+      <span>Generating feedback...</span>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     VIEW 4: RESULTS
+════════════════════════════════════════════════════ -->
+<div id="view-results" class="view">
+<div class="page">
+  <div class="page-title">Results & Feedback</div>
+  <div class="page-sub">Detailed AI-generated scores and feedback for each student response.</div>
+
+  <div id="noResults" class="alert alert-info">No completed exams yet. Results appear here after a student finishes their exam.</div>
+
+  <div id="resultsContent" class="hidden">
+    <div class="overall-score">
+      <div class="overall-num" id="overallScoreNum">—</div>
+      <div class="overall-label" id="overallScoreLabel">Overall Score / 10</div>
+      <div style="margin-top:12px;font-size:14px;opacity:0.8;" id="studentResultName"></div>
+    </div>
+
+    <div id="resultsList"></div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:1rem;">
+      <button class="btn btn-navy" onclick="downloadReport()">↓ Download Full Report</button>
+      <button class="btn btn-outline" onclick="clearResults()">Clear Results</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let state = {
+  apiKey: localStorage.getItem('oraliq_key') || '',
+  questions: [],        // Generated exam questions
+  practiceQs: [],       // Practice questions
+  practiceIdx: 0,
+  currentExam: {
+    studentName: '',
+    studentEmail: '',
+    teamMembers: '',
+    qIndex: 0,
+    answers: [],        // [{question, answer, audioBlob, role}]
+    results: []         // [{question, answer, score, contentFb, commFb, strong, missing}]
+  },
+  sessions: JSON.parse(localStorage.getItem('oraliq_sessions') || '[]'),
+  mediaRecorder: null,
+  audioChunks: [],
+  recordingTimer: null,
+  recordSeconds: 0,
+  examTimer: null,
+  examTimeLeft: 0,
+  timeLimit: 0,
+};
+
+if (state.apiKey) {
+  document.getElementById('apiBanner').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function switchView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  event.target.classList.add('active');
+
+  if (name === 'results') renderResults();
+  if (name === 'student') refreshStudentView();
+}
+
+function facultyTab(btn, tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  ['setup','questions','students'].forEach(t => {
+    document.getElementById('ftab-' + t).classList.toggle('hidden', t !== tab);
+  });
+  if (tab === 'students') renderStudentSessions();
+}
+
+// ═══════════════════════════════════════════════════════════
+// API KEY
+// ═══════════════════════════════════════════════════════════
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (!key) return;
+  state.apiKey = key;
+  localStorage.setItem('oraliq_key', key);
+  document.getElementById('apiKeySaved').classList.remove('hidden');
+  setTimeout(() => document.getElementById('apiBanner').style.display = 'none', 1200);
+}
+
+// ═══════════════════════════════════════════════════════════
+// FILE UPLOAD
+// ═══════════════════════════════════════════════════════════
+function handleFileUpload(input, textareaId, dropId) {
+  const file = input.files[0];
+  if (!file) return;
+  const drop = document.getElementById(dropId);
+  drop.classList.add('has-file');
+  drop.querySelector('.file-drop-text').innerHTML = `<strong>✓ ${file.name}</strong>File loaded`;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById(textareaId).value = e.target.result;
+  };
+  reader.readAsText(file);
+}
+
+// ═══════════════════════════════════════════════════════════
+// CLAUDE API CALL
+// ═══════════════════════════════════════════════════════════
+async function callClaude(prompt, systemPrompt = '') {
+  if (!state.apiKey) {
+    throw new Error('No API key. Please enter your Anthropic API key at the top of the page.');
+  }
+  const messages = [{ role: 'user', content: prompt }];
+  const body = {
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 2000,
+    messages,
+  };
+  if (systemPrompt) body.system = systemPrompt;
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-api-key': state.apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error?.message || 'API error');
+  }
+  const data = await res.json();
+  return data.content[0].text;
+}
+
+// ═══════════════════════════════════════════════════════════
+// QUESTION GENERATION
+// ═══════════════════════════════════════════════════════════
+async function generateQuestions(isPractice = false) {
+  const prompt = document.getElementById('promptText').value.trim();
+  const rubric = document.getElementById('rubricText').value.trim();
+  const submission = document.getElementById('submissionText').value.trim();
+  const n = parseInt(document.getElementById('numQuestions').value) || 5;
+  const subject = document.getElementById('subjectArea').value || 'Business';
+
+  if (!prompt && !rubric) {
+    alert('Please enter an assignment prompt or rubric first.');
+    return;
+  }
+
+  const loading = document.getElementById('genLoading');
+  const errBox = document.getElementById('genError');
+  loading.classList.remove('hidden');
+  errBox.classList.add('hidden');
+
+  const roles = ['Examiner', 'Skeptical Client', 'Your Supervisor', 'Peer Reviewer', 'Board Member', 'Venture Capitalist'];
+
+  const systemPrompt = `You are an expert ${subject} professor designing rigorous oral exam questions. You create questions that test genuine understanding, not memorization. Students cannot look things up in real time — questions must require conceptual mastery and application.`;
+
+  const userPrompt = `Generate ${n} oral exam questions for a ${subject} course.
+${isPractice ? 'These are PRACTICE questions — similar in style and difficulty to the real exam but on slightly different angles.' : 'These are REAL exam questions aligned to the grading rubric.'}
+
+Assignment Prompt:
+${prompt || '(not provided)'}
+
+Grading Rubric:
+${rubric || '(not provided)'}
+
+${submission ? `Student Submission:\n${submission.slice(0, 1500)}` : ''}
+
+Return ONLY a valid JSON array, no markdown, no explanation. Format:
+[
+  {
+    "question": "Full question text here",
+    "criteria": "What rubric criteria this tests",
+    "role": "Examiner",
+    "difficulty": "medium"
+  }
+]
+
+Vary the roles from: ${roles.join(', ')}.
+Make questions require application and critical thinking. No yes/no questions.`;
+
+  try {
+    const raw = await callClaude(userPrompt, systemPrompt);
+    let cleaned = raw.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(cleaned);
+    if (isPractice) {
+      state.practiceQs = parsed;
+      switchView('practice');
+      renderPracticeQuestions();
+    } else {
+      state.questions = parsed;
+      state.timeLimit = parseInt(document.getElementById('timeLimit').value) || 0;
+      renderQuestionBank();
+      facultyTab(document.querySelectorAll('.tab')[1], 'questions');
+    }
+  } catch(e) {
+    errBox.textContent = 'Error: ' + e.message;
+    errBox.classList.remove('hidden');
+  } finally {
+    loading.classList.add('hidden');
+  }
+}
+
+function renderQuestionBank() {
+  const bank = document.getElementById('questionBank');
+  const actions = document.getElementById('qActions');
+  if (!state.questions.length) {
+    bank.innerHTML = '<div class="alert alert-info">No questions yet.</div>';
+    actions.classList.add('hidden');
+    return;
+  }
+  bank.innerHTML = state.questions.map((q,i) => `
+    <div class="question-item" id="qi-${i}">
+      <div class="q-num">Question ${i+1} of ${state.questions.length}</div>
+      <div class="q-actions">
+        <button class="btn btn-outline btn-sm" onclick="editQuestion(${i})">Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteQuestion(${i})">✕</button>
+      </div>
+      <div class="q-text">${q.question}</div>
+      <span class="q-role">Role: ${q.role}</span>
+      ${q.criteria ? `<span class="q-role" style="margin-left:6px;background:rgba(30,150,100,0.1);color:var(--success)">Tests: ${q.criteria}</span>` : ''}
+    </div>
+  `).join('');
+  actions.classList.remove('hidden');
+}
+
+function editQuestion(i) {
+  const newQ = prompt('Edit question:', state.questions[i].question);
+  if (newQ !== null) {
+    state.questions[i].question = newQ;
+    renderQuestionBank();
+  }
+}
+
+function deleteQuestion(i) {
+  if (confirm('Delete this question?')) {
+    state.questions.splice(i, 1);
+    renderQuestionBank();
+  }
+}
+
+function saveSessionLink() {
+  if (!state.questions.length) return;
+  const assignment = document.getElementById('assignTitle').value || 'Exam';
+  localStorage.setItem('oraliq_questions', JSON.stringify(state.questions));
+  localStorage.setItem('oraliq_timelimit', state.timeLimit);
+  localStorage.setItem('oraliq_assignment', assignment);
+  const linkBox = document.getElementById('examLinkBox');
+  document.getElementById('examLinkText').textContent =
+    `✓ Exam saved! Students can now access it under the "Student Exam" tab. Share this page's URL with your students. Assignment: "${assignment}"`;
+  linkBox.classList.remove('hidden');
+}
+
+function downloadQuestions() {
+  const data = JSON.stringify({
+    assignment: document.getElementById('assignTitle').value,
+    questions: state.questions,
+    generatedAt: new Date().toISOString()
+  }, null, 2);
+  downloadFile('exam_questions.json', data, 'application/json');
+}
+
+// ═══════════════════════════════════════════════════════════
+// STUDENT EXAM
+// ═══════════════════════════════════════════════════════════
+function refreshStudentView() {
+  const saved = localStorage.getItem('oraliq_questions');
+  if (saved) state.questions = JSON.parse(saved);
+  const tl = localStorage.getItem('oraliq_timelimit');
+  if (tl) state.timeLimit = parseInt(tl);
+  const assessType = document.getElementById('assessType');
+  const teamSection = document.getElementById('teamSection');
+  if (assessType && assessType.value === 'team') teamSection.classList.remove('hidden');
+}
+
+function startExam() {
+  const name = document.getElementById('studentName').value.trim();
+  const email = document.getElementById('studentEmail').value.trim();
+  if (!name) { alert('Please enter your name.'); return; }
+
+  const qs = JSON.parse(localStorage.getItem('oraliq_questions') || '[]');
+  if (!qs.length) {
+    document.getElementById('noQuestionsAlert').classList.remove('hidden');
+    return;
+  }
+  state.questions = qs;
+  state.timeLimit = parseInt(localStorage.getItem('oraliq_timelimit') || '0');
+  state.currentExam = {
+    studentName: name,
+    studentEmail: email,
+    teamMembers: document.getElementById('teamMembers').value,
+    qIndex: 0,
+    answers: [],
+    results: []
+  };
+
+  document.getElementById('studentInfoSection').classList.add('hidden');
+  document.getElementById('examSection').classList.remove('hidden');
+  loadExamQuestion();
+}
+
+function loadExamQuestion() {
+  const exam = state.currentExam;
+  const q = state.questions[exam.qIndex];
+
+  // Progress dots
+  const prog = document.getElementById('examProgress');
+  prog.innerHTML = state.questions.map((_, i) => `
+    <div class="progress-dot ${i < exam.qIndex ? 'done' : i === exam.qIndex ? 'active' : ''}"></div>
+  `).join('');
+
+  document.getElementById('examRole').textContent = q.role || 'Examiner';
+  document.getElementById('examQText').textContent = q.question;
+  document.getElementById('studentAnswer').value = '';
+  document.getElementById('qCounter').textContent = `Question ${exam.qIndex + 1} of ${state.questions.length}`;
+  document.getElementById('audioPlayback').classList.add('hidden');
+  document.getElementById('audioPlayback').innerHTML = '';
+
+  // Timer
+  if (state.timeLimit > 0) {
+    state.examTimeLeft = state.timeLimit;
+    document.getElementById('timerText').classList.remove('hidden');
+    document.getElementById('timerBar').classList.remove('hidden');
+    updateTimerDisplay();
+    state.examTimer = setInterval(() => {
+      state.examTimeLeft--;
+      updateTimerDisplay();
+      if (state.examTimeLeft <= 0) {
+        clearInterval(state.examTimer);
+        submitAnswer(true);
+      }
+    }, 1000);
+  } else {
+    document.getElementById('timerText').classList.add('hidden');
+    document.getElementById('timerBar').classList.add('hidden');
+  }
+}
+
+function updateTimerDisplay() {
+  const t = state.examTimeLeft;
+  const pct = (t / state.timeLimit) * 100;
+  document.getElementById('timerVal').textContent = `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`;
+  document.getElementById('timerFill').style.width = pct + '%';
+  document.getElementById('timerFill').style.background = pct < 25 ? '#e24b4a' : pct < 50 ? '#f5a623' : 'var(--accent)';
+}
+
+function submitAnswer(autoSubmit = false) {
+  clearInterval(state.examTimer);
+  const answer = document.getElementById('studentAnswer').value.trim();
+  const q = state.questions[state.currentExam.qIndex];
+  state.currentExam.answers.push({ question: q.question, role: q.role, criteria: q.criteria, answer: answer || '[No answer provided]' });
+  state.currentExam.qIndex++;
+
+  if (state.currentExam.qIndex >= state.questions.length) {
+    finishExam();
+  } else {
+    loadExamQuestion();
+  }
+}
+
+async function finishExam() {
+  document.getElementById('examSection').classList.add('hidden');
+  document.getElementById('gradingSection').classList.remove('hidden');
+
+  const rubric = localStorage.getItem('oraliq_rubric') || document.getElementById('rubricText').value || 'Standard business school rubric: conceptual understanding, application, communication clarity.';
+  const assignment = localStorage.getItem('oraliq_assignment') || 'Business Assignment';
+
+  const systemPrompt = `You are an expert business school professor grading oral exam responses. Be fair, specific, and constructive. Focus on genuine understanding vs surface-level answers.`;
+
+  const answersText = state.currentExam.answers.map((a,i) =>
+    `Q${i+1} [Role: ${a.role}]: ${a.question}\nStudent Answer: ${a.answer}`
+  ).join('\n\n');
+
+  const prompt = `Grade these oral exam responses for assignment "${assignment}".
+
+GRADING RUBRIC:
+${rubric}
+
+STUDENT RESPONSES:
+${answersText}
+
+Return ONLY a valid JSON array with one object per question:
+[
+  {
+    "score": 8,
+    "contentFeedback": "Strong conceptual understanding shown...",
+    "communicationFeedback": "Clear and well-structured response...",
+    "strengths": "Specific strong points...",
+    "improvements": "What was missing or could be stronger..."
+  }
+]
+Score each out of 10. Be specific, reference what they actually said.`;
+
+  try {
+    const raw = await callClaude(prompt, systemPrompt);
+    let cleaned = raw.replace(/```json|```/g, '').trim();
+    const feedback = JSON.parse(cleaned);
+    state.currentExam.results = feedback;
+
+    // Save session
+    const session = {
+      id: Date.now(),
+      studentName: state.currentExam.studentName,
+      studentEmail: state.currentExam.studentEmail,
+      teamMembers: state.currentExam.teamMembers,
+      assignment: localStorage.getItem('oraliq_assignment') || 'Exam',
+      completedAt: new Date().toISOString(),
+      answers: state.currentExam.answers,
+      results: feedback,
+      avgScore: (feedback.reduce((s,r) => s + (r.score||0), 0) / feedback.length).toFixed(1)
+    };
+    state.sessions.unshift(session);
+    localStorage.setItem('oraliq_sessions', JSON.stringify(state.sessions));
+
+    // Switch to results
+    document.getElementById('gradingSection').classList.add('hidden');
+    switchView('results');
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.nav-btn')[3].classList.add('active');
+    renderResults(session);
+  } catch(e) {
+    document.getElementById('gradingSection').innerHTML = `<div class="alert alert-error">Grading error: ${e.message}</div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// RECORDING
+// ═══════════════════════════════════════════════════════════
+async function toggleRecording() {
+  const btn = document.getElementById('recordBtn');
+  if (state.mediaRecorder && state.mediaRecorder.state === 'recording') {
+    state.mediaRecorder.stop();
+    btn.classList.remove('recording');
+    clearInterval(state.recordingTimer);
+    document.getElementById('recordStatus').textContent = 'Recording saved';
+    return;
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    state.audioChunks = [];
+    state.mediaRecorder = new MediaRecorder(stream);
+    state.mediaRecorder.ondataavailable = e => state.audioChunks.push(e.data);
+    state.mediaRecorder.onstop = () => {
+      const blob = new Blob(state.audioChunks, { type: 'audio/webm' });
+      const url = URL.createObjectURL(blob);
+      const pb = document.getElementById('audioPlayback');
+      pb.innerHTML = `<audio controls src="${url}"></audio>`;
+      pb.classList.remove('hidden');
+      document.getElementById('transcriptSection').classList.remove('hidden');
+      stream.getTracks().forEach(t => t.stop());
+    };
+    state.mediaRecorder.start();
+    btn.classList.add('recording');
+    state.recordSeconds = 0;
+    state.recordingTimer = setInterval(() => {
+      state.recordSeconds++;
+      const m = Math.floor(state.recordSeconds/60);
+      const s = state.recordSeconds % 60;
+      document.getElementById('recordTime').textContent = `${m}:${String(s).padStart(2,'0')}`;
+    }, 1000);
+    document.getElementById('recordStatus').textContent = 'Recording... click to stop';
+  } catch(e) {
+    document.getElementById('recordStatus').textContent = 'Microphone access denied. Please type your answer.';
+  }
+}
+
+function handleAudioUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const maxMB = 25;
+  if (file.size > maxMB * 1024 * 1024) {
+    alert(`File too large. Maximum size is ${maxMB}MB. For audio, this is approximately 30 minutes. For video, please upload just the audio track.`);
+    return;
+  }
+  const url = URL.createObjectURL(file);
+  const pb = document.getElementById('audioPlayback');
+  const tag = file.type.startsWith('video') ? 'video' : 'audio';
+  pb.innerHTML = `<${tag} controls src="${url}" style="width:100%;max-height:200px;"></${tag}>`;
+  pb.classList.remove('hidden');
+  document.getElementById('transcriptSection').classList.remove('hidden');
+  document.getElementById('recordStatus').textContent = `File uploaded: ${file.name} (${(file.size/1024/1024).toFixed(1)}MB)`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// PRACTICE MODE
+// ═══════════════════════════════════════════════════════════
+async function generatePractice() {
+  const prompt = document.getElementById('practicePrompt').value.trim();
+  const subject = document.getElementById('practiceSubject').value;
+
+  const loading = document.getElementById('practiceLoading');
+  loading.classList.remove('hidden');
+  document.getElementById('practiceQuestions').innerHTML = '';
+  document.getElementById('practiceExamSection').classList.add('hidden');
+
+  const systemPrompt = `You are a ${subject} professor creating practice oral exam questions to help students prepare. Questions should be challenging but educational.`;
+
+  const userPrompt = `Generate 6 practice oral exam questions for a ${subject} course.
+${prompt ? `Topic/Assignment context: ${prompt}` : 'Use general business school concepts for this subject.'}
+
+These are PRACTICE questions — different from the real exam but same style and difficulty.
+Return ONLY a valid JSON array:
+[{"question":"...","hint":"A brief conceptual hint to guide thinking","difficulty":"easy|medium|hard"}]`;
+
+  try {
+    const raw = await callClaude(userPrompt, systemPrompt);
+    let cleaned = raw.replace(/```json|```/g, '').trim();
+    state.practiceQs = JSON.parse(cleaned);
+    state.practiceIdx = 0;
+    renderPracticeQuestions();
+  } catch(e) {
+    document.getElementById('practiceQuestions').innerHTML = `<div class="alert alert-error">Error: ${e.message}</div>`;
+  } finally {
+    loading.classList.add('hidden');
+  }
+}
+
+function renderPracticeQuestions() {
+  const container = document.getElementById('practiceQuestions');
+  if (!state.practiceQs.length) return;
+  container.innerHTML = `
+    <div class="card">
+      <div class="card-title">Your Practice Set — ${state.practiceQs.length} Questions</div>
+      ${state.practiceQs.map((q,i) => `
+        <div class="question-item" style="cursor:pointer;" onclick="startPracticeQ(${i})">
+          <div class="q-num">${q.difficulty ? q.difficulty.toUpperCase() : 'MEDIUM'} · Question ${i+1}</div>
+          <div class="q-text">${q.question}</div>
+          ${q.hint ? `<div style="font-size:12px;color:var(--text-light);margin-top:6px;">💡 Hint: ${q.hint}</div>` : ''}
+        </div>
+      `).join('')}
+      <button class="btn btn-navy mt1" onclick="startPracticeQ(0)">Start Practice Exam →</button>
+    </div>
+  `;
+}
+
+function startPracticeQ(idx) {
+  state.practiceIdx = idx;
+  document.getElementById('practiceExamSection').classList.remove('hidden');
+  document.getElementById('practiceFeedbackSection').classList.add('hidden');
+  document.getElementById('practiceAnswer').value = '';
+  loadPracticeQ();
+}
+
+function loadPracticeQ() {
+  const q = state.practiceQs[state.practiceIdx];
+  document.getElementById('practiceQNum').textContent = `${state.practiceIdx + 1} of ${state.practiceQs.length}`;
+  document.getElementById('practiceQText').textContent = q.question;
+  document.getElementById('practiceFeedbackSection').classList.add('hidden');
+  document.getElementById('practiceAnswer').value = '';
+  document.getElementById('practiceExamSection').scrollIntoView({ behavior: 'smooth' });
+}
+
+async function submitPracticeAnswer() {
+  const answer = document.getElementById('practiceAnswer').value.trim();
+  if (!answer) { alert('Please write an answer first.'); return; }
+  const q = state.practiceQs[state.practiceIdx];
+
+  document.getElementById('practiceFeedbackLoading').classList.remove('hidden');
+  document.getElementById('practiceFeedbackSection').classList.add('hidden');
+
+  try {
+    const raw = await callClaude(
+      `You are a business professor giving quick practice feedback.\nQuestion: ${q.question}\nStudent Answer: ${answer}\n\nGive brief, encouraging feedback in 3 parts:\n1. What they got right\n2. What's missing or could be stronger\n3. One specific tip for the real exam\n\nKeep it under 200 words total. Be direct and helpful.`,
+      'You are a supportive business school professor giving oral exam practice feedback.'
+    );
+    document.getElementById('practiceFeedback').innerHTML = `<div style="font-size:14px;line-height:1.7;color:var(--text-mid);">${raw.replace(/\n/g,'<br>')}</div>`;
+    document.getElementById('practiceFeedbackSection').classList.remove('hidden');
+  } catch(e) {
+    document.getElementById('practiceFeedback').innerHTML = `<div class="alert alert-error">${e.message}</div>`;
+    document.getElementById('practiceFeedbackSection').classList.remove('hidden');
+  } finally {
+    document.getElementById('practiceFeedbackLoading').classList.add('hidden');
+  }
+}
+
+function skipPracticeQ() { nextPracticeQ(); }
+function nextPracticeQ() {
+  if (state.practiceIdx + 1 < state.practiceQs.length) {
+    state.practiceIdx++;
+    loadPracticeQ();
+  } else {
+    document.getElementById('practiceExamSection').classList.add('hidden');
+    document.getElementById('practiceQuestions').innerHTML += `<div class="alert alert-success" style="margin-top:1rem;">✓ Practice complete! You answered all ${state.practiceQs.length} questions. Generate a new set to keep practicing.</div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// RESULTS
+// ═══════════════════════════════════════════════════════════
+function renderResults(session) {
+  const noRes = document.getElementById('noResults');
+  const content = document.getElementById('resultsContent');
+
+  if (!session && state.sessions.length) session = state.sessions[0];
+  if (!session || !session.results || !session.results.length) {
+    noRes.classList.remove('hidden');
+    content.classList.add('hidden');
+    return;
+  }
+
+  noRes.classList.add('hidden');
+  content.classList.remove('hidden');
+
+  const avg = parseFloat(session.avgScore);
+  document.getElementById('overallScoreNum').textContent = avg.toFixed(1) + '/10';
+  document.getElementById('overallScoreLabel').textContent = `${session.assignment} — AI-Generated Score`;
+  document.getElementById('studentResultName').textContent = `${session.studentName} · ${new Date(session.completedAt).toLocaleDateString()}`;
+
+  const list = document.getElementById('resultsList');
+  list.innerHTML = session.results.map((r, i) => {
+    const sc = r.score || 0;
+    const cls = sc >= 8 ? 'high' : sc >= 6 ? 'mid' : 'low';
+    const ans = session.answers[i];
+    return `
+      <div class="feedback-item">
+        <div class="feedback-header">
+          <div class="score-badge ${cls}">${sc}</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:500;color:var(--text);">Question ${i+1}</div>
+            <div style="font-size:13px;color:var(--text-mid);">${ans ? ans.question : ''}</div>
+          </div>
+          <span class="q-role">${ans ? ans.role : ''}</span>
+        </div>
+        <div class="feedback-body">
+          ${ans ? `<div class="feedback-section"><div class="feedback-label">Student's Answer</div><div class="feedback-text" style="background:var(--cream);padding:10px;border-radius:8px;">${ans.answer}</div></div>` : ''}
+          <div class="grid-2">
+            <div class="feedback-section">
+              <div class="feedback-label">Content Feedback</div>
+              <div class="feedback-text">${r.contentFeedback || r.content_feedback || '—'}</div>
+            </div>
+            <div class="feedback-section">
+              <div class="feedback-label">Communication Feedback</div>
+              <div class="feedback-text">${r.communicationFeedback || r.communication_feedback || '—'}</div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="feedback-section">
+              <div class="feedback-label" style="color:var(--success);">✓ Strengths</div>
+              <div class="feedback-text">${r.strengths || r.what_was_strong || '—'}</div>
+            </div>
+            <div class="feedback-section">
+              <div class="feedback-label" style="color:#e24b4a;">↑ Improvements</div>
+              <div class="feedback-text">${r.improvements || r.what_was_missing || '—'}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderStudentSessions() {
+  const list = document.getElementById('studentSessionList');
+  if (!state.sessions.length) {
+    list.innerHTML = '<div class="alert alert-info">No student sessions yet.</div>';
+    return;
+  }
+  list.innerHTML = state.sessions.map((s,i) => `
+    <div class="student-row">
+      <div class="student-info">
+        <div class="student-name">${s.studentName} ${s.teamMembers ? `<span style="font-size:12px;color:var(--text-light);">(Team)</span>` : ''}</div>
+        <div class="student-meta">${s.assignment} · ${new Date(s.completedAt).toLocaleDateString()} · ${s.answers.length} questions</div>
+      </div>
+      <div style="font-size:20px;font-weight:600;color:${parseFloat(s.avgScore)>=7?'var(--success)':parseFloat(s.avgScore)>=5?'var(--gold)':'#e24b4a'}">${s.avgScore}/10</div>
+      <button class="btn btn-outline btn-sm" onclick="viewSession(${i})">View →</button>
+    </div>
+  `).join('');
+}
+
+function viewSession(i) {
+  const session = state.sessions[i];
+  switchView('results');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.nav-btn')[3].classList.add('active');
+  renderResults(session);
+}
+
+function clearResults() {
+  if (confirm('Clear all session results?')) {
+    state.sessions = [];
+    localStorage.removeItem('oraliq_sessions');
+    renderResults();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// DOWNLOAD REPORT
+// ═══════════════════════════════════════════════════════════
+function downloadReport() {
+  if (!state.sessions.length) return;
+  const session = state.sessions[0];
+  const lines = [
+    `ORAL EXAM REPORT — OralIQ`,
+    `========================================`,
+    `Student: ${session.studentName}`,
+    `Email: ${session.studentEmail}`,
+    `Assignment: ${session.assignment}`,
+    `Date: ${new Date(session.completedAt).toLocaleString()}`,
+    `Overall Score: ${session.avgScore}/10`,
+    `========================================\n`,
+    ...session.answers.map((a, i) => {
+      const r = session.results[i] || {};
+      return [
+        `QUESTION ${i+1} [Role: ${a.role}]`,
+        `Question: ${a.question}`,
+        `Student Answer: ${a.answer}`,
+        `Score: ${r.score || '—'}/10`,
+        `Content Feedback: ${r.contentFeedback || r.content_feedback || '—'}`,
+        `Communication Feedback: ${r.communicationFeedback || r.communication_feedback || '—'}`,
+        `Strengths: ${r.strengths || r.what_was_strong || '—'}`,
+        `Improvements: ${r.improvements || r.what_was_missing || '—'}`,
+        `----------------------------------------`
+      ].join('\n');
+    }),
+    `\nReport generated by OralIQ — AI Oral Assessment Platform`
+  ];
+  downloadFile(`${session.studentName.replace(/\s/g,'_')}_exam_report.txt`, lines.join('\n'), 'text/plain');
+}
+
+function downloadFile(name, content, type) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], { type }));
+  a.download = name;
+  a.click();
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+// Load saved questions on page load
+(function init() {
+  const saved = localStorage.getItem('oraliq_questions');
+  if (saved) {
+    try { state.questions = JSON.parse(saved); } catch(e) {}
+  }
+})();
+</script>
+</body>
+</html>
