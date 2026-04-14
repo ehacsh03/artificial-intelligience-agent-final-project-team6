@@ -4,8 +4,8 @@
 
 ---
 
-![OralIQ Workflow](images/workflow_diagram.png)
-![Problem Framing](images/problem_diagram.png)
+![OralIQ Workflow](workflow_diagram.png)
+![Problem Framing](problem_diagram.png)
 
 ---
 
