@@ -25,7 +25,7 @@ OralIQ bridges this gap. It is an agentic AI application that allows faculty to 
 |------|--------|
 | [Joel Emanuel](https://github.com/JoelEmanuel) | MSBA, Class of 2026 |
 | [Louisa Ferrell](https://github.com/louisaferrell) | MSBA, Class of 2026 |
-| [Regan Macak](https://github.com/ReganMacak) | MSBA, Class of 2026 |
+| [Regan Macak](https://github.com/rmmacak) | MSBA, Class of 2026 |
 | [Ethiana Hacsh](https://github.com/ehacsh03) | MSBA, Class of 2026 |
 
 ---
